@@ -31,16 +31,19 @@
     <aside class="panel">
       <div class="panel-section">
         <h2>Find a location</h2>
-        <input id="search" class="input" type="text" placeholder="Search by farm name or ID (mock)" />
+        <div class="search-container">
+          <input id="search" class="input" type="text" placeholder="Search by farm name or ID (mock)" autocomplete="off" />
+          <ul id="search-results" class="search-results hidden"></ul>
+        </div>
         <p class="hint">In the prototype, search can match mock data fields.</p>
       </div>
 
       <div class="panel-section">
         <h2>Filters</h2>
-        <div class="filters">
-          <label><input type="checkbox" checked /> Low</label>
-          <label><input type="checkbox" checked /> Medium</label>
-          <label><input type="checkbox" checked /> High</label>
+        <div class="filters" id="risk-filters">
+          <label><input type="checkbox" value="low" checked /> Low</label>
+          <label><input type="checkbox" value="medium" checked /> Medium</label>
+          <label><input type="checkbox" value="high" checked /> High</label>
         </div>
       </div>
 
