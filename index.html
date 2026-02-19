@@ -22,7 +22,6 @@
     </div>
 
     <div class="topbar-right">
-      <span class="badge">Login</span>
       <span class="note">This is just a prototype</span>
     </div>
   </header>
@@ -76,6 +75,20 @@
       </div>
     </section>
   </main>
+  <div class="chatbot" id="chatbot">
+  <div class="chat-header">
+    <strong>GrazeSafe Assistant</strong>
+    <button id="chatToggle" class="chat-toggle">–</button>
+  </div>
+
+  <div class="chat-body" id="chatBody"></div>
+
+  <form class="chat-input" id="chatForm">
+    <input id="chatText" type="text" placeholder="Type 'help'…" autocomplete="off" />
+    <button type="submit">Send</button>
+  </form>
+</div>
+
 </body>
 </html>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
