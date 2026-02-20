@@ -144,6 +144,38 @@ body {
   box-shadow: 0 0 0 4px rgba(11, 92, 171, 0.10);
 }
 
+.button {
+  width: 100%;
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(11, 92, 171, 0.22);
+  background: var(--primary);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.button:hover {
+  background: var(--primary-2);
+  border-color: rgba(11, 92, 171, 0.40);
+}
+
+.button:active {
+  transform: scale(0.98);
+}
+
+.button.active {
+  background: var(--high);
+  border-color: rgba(214, 69, 69, 0.40);
+}
+
+.button.active:hover {
+  background: #c03a3a;
+}
+
 .input::placeholder {
   color: rgba(11, 31, 53, 0.45);
 }

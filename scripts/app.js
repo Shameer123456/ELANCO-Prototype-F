@@ -1,7 +1,19 @@
 import { initMap } from "./map.js";
+import {
+  initComparisonHandler,
+  selectComparisonLocation,
+  startComparison,
+  stopComparison,
+  isComparisonModeActive,
+} from "./compare.js";
+import { initComparisonUI } from "./compareUI.js";
+import { initChatbot } from "./chatbot.js";
 import { mockFarms } from "./data.js";
+import { getOpenMeteoTemperatureAndRainfall } from "./api.js";
+import { computeRiskLevel } from "./utils.js";
 
-const map = initMap();
+// Initialize the application
+const { map, resetView, zoomTo } = initMap();
 
 //elements for the side panel
 const panel = document.getElementById("right-panel");
@@ -9,9 +21,72 @@ const closeBtn = document.getElementById("close-panel");
 const titleEl = document.getElementById("panel-title");
 const ownerEl = document.getElementById("panel-owner");
 const riskEl = document.getElementById("panel-risk");
+const weatherEl = document.getElementById("panel-weather");
+
+async function loadWeatherForFarm(farm) {
+  if (!weatherEl || !farm?.location || farm.location.length !== 2) return;
+
+  const [latitude, longitude] = farm.location;
+
+  weatherEl.textContent = "Loading weather data...";
+
+  try {
+    const weather = await getOpenMeteoTemperatureAndRainfall(latitude, longitude);
+
+    const temperatures = weather.temperature_2m ?? [];
+    const rainfall = weather.precipitation ?? [];
+    const timezone = weather.timezone;
+    const elevation = weather.elevation;
+
+    const avgTemp =
+      temperatures.length > 0
+        ? temperatures.reduce((a, b) => a + b, 0) / temperatures.length
+        : null;
+    const totalRain =
+      rainfall.length > 0 ? rainfall.reduce((a, b) => a + b, 0) : null;
+    const maxRain =
+      rainfall.length > 0 ? Math.max(...rainfall) : null;
+
+    const parts = [];
+    parts.push(`<strong>Weather summary</strong>`);
+    parts.push(
+      `Location: ${latitude.toFixed(4)}, ${longitude.toFixed(4)}`
+    );
+    if (elevation != null) {
+      parts.push(`Elevation: ${elevation} m`);
+    }
+    if (timezone) {
+      parts.push(`Timezone: ${timezone}`);
+    }
+    if (avgTemp != null) {
+      parts.push(`Average temperature: ${avgTemp.toFixed(1)} °C`);
+    }
+    if (totalRain != null) {
+      parts.push(`Total rainfall: ${totalRain.toFixed(1)} mm`);
+    }
+    if (maxRain != null) {
+      parts.push(`Max hourly rainfall: ${maxRain.toFixed(1)} mm`);
+    }
+
+    // Compute and display risk based on weather
+    if (avgTemp != null && totalRain != null && riskEl) {
+      const riskLevel = computeRiskLevel(avgTemp, totalRain);
+      riskEl.textContent = riskLevel.toUpperCase();
+      riskEl.className = "";
+      riskEl.classList.add(riskLevel);
+      parts.push(`Risk level: ${riskLevel.toUpperCase()}`);
+    }
+
+    weatherEl.innerHTML = parts.join("<br>");
+  } catch (error) {
+    console.error("Error loading weather for farm:", error);
+    weatherEl.textContent = "Unable to load weather data for this location.";
+  }
+}
 
 //helper functions for side panel
 function openPanel(farm) {
+  if (!panel) return;
 
   titleEl.textContent = farm.name;
   ownerEl.textContent = farm.owner;
@@ -23,11 +98,19 @@ function openPanel(farm) {
 
   //shows panel
   panel.classList.remove("hidden");
+
+   // Load weather details for this farm
+  loadWeatherForFarm(farm);
 }
 
-closeBtn.addEventListener("click", () => {
-  panel.classList.add("hidden");
-});
+if (closeBtn && panel) {
+  closeBtn.addEventListener("click", () => {
+    panel.classList.add("hidden");
+  });
+}
+
+function createFarmMarker(map, farm) {
+  if (!farm?.location || farm.location.length !== 2) return null;
 
 //show panel
 const farmMarkers = [];
@@ -56,6 +139,17 @@ mockFarms.forEach(farm => {
 
   //when clicked open panel and zoom in
   marker.on("click", () => {
+    // In comparison mode, marker clicks are used to select locations for comparison.
+    if (isComparisonModeActive()) {
+      const [lat, lng] = farm.location;
+      selectComparisonLocation(map, {
+        lat,
+        lng,
+        name: farm.name,
+      });
+      return;
+    }
+
     openPanel(farm);
     map.flyTo(farm.location, 14, { duration: 1.5 }); 
   });

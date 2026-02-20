@@ -39,6 +39,12 @@
       </div>
 
       <div class="panel-section">
+        <h2>Compare Locations</h2>
+        <button id="compare-btn" class="button">Start Comparison</button>
+        <p class="hint" id="compare-hint">Click to compare weather between two locations</p>
+      </div>
+
+      <div class="panel-section">
         <h2>Filters</h2>
         <div class="filters" id="risk-filters">
           <label><input type="checkbox" value="low" checked /> Low</label>
@@ -76,18 +82,37 @@
 
     <section class="map-area">
       <div id="map"></div>
+
+      <!-- Farm details side panel overlaying the map -->
       <div id="right-panel" class="details-panel hidden">
         <div class="panel-header">
-          <h2 id="panel-title">Farm Name</h2>
-          <button id="close-panel" class="close-btn">&times;</button>
+          <h2 id="panel-title">Select a farm</h2>
+          <button id="close-panel" class="close-btn" aria-label="Close details">&times;</button>
         </div>
         <div class="panel-content">
-          <p><strong>Owner:</strong> <span id="panel-owner">-</span></p>
-          <p><strong>Risk Level:</strong> <span id="panel-risk">-</span></p>
+          <p><strong>Owner:</strong> <span id="panel-owner">—</span></p>
+          <p><strong>Risk level:</strong> <span id="panel-risk">—</span></p>
+          <hr />
+          <div id="panel-weather" class="small">
+            Click a farm marker to load recent weather for this location.
           </div>
+        </div>
       </div>
     </section>
   </main>
+  <div class="chatbot" id="chatbot">
+    <div class="chat-header">
+      <strong>AI Assistant</strong>
+      <button id="chatToggle" class="chat-toggle">–</button>
+    </div>
+
+    <div class="chat-body" id="chatBody"></div>
+
+    <form class="chat-input" id="chatForm">
+      <input id="chatText" type="text" placeholder="Type 'help'…" autocomplete="off" />
+      <button type="submit">Send</button>
+    </form>
+  </div>
 </body>
 <footer class="elanco-footer">
 
@@ -187,4 +212,3 @@
 </html>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script type="module" src="./scripts/app.js"></script>
-
