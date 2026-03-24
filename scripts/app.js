@@ -1,12 +1,4 @@
 import { initMap } from "./map.js";
-import {
-  initComparisonHandler,
-  selectComparisonLocation,
-  startComparison,
-  stopComparison,
-  isComparisonModeActive,
-} from "./compare.js";
-import { initComparisonUI } from "./compareUI.js";
 import { initChatbot } from "./chatbot.js";
 import { mockFarms } from "./data.js";
 import { getOpenMeteoTemperatureAndRainfall } from "./api.js";
@@ -143,13 +135,6 @@ function createFarmMarker(map, farm) {
   const marker = L.marker(farm.location, { icon }).addTo(map);
 
   marker.on("click", () => {
-    // In comparison mode, marker clicks are used to select locations for comparison.
-    if (isComparisonModeActive()) {
-      const [lat, lng] = farm.location;
-      selectComparisonLocation(map, { lat, lng, name: farm.name });
-      return;
-    }
-
     selectedFarm = farm;
     openPanel(farm);
     map.flyTo(farm.location, 14, { duration: 1.5 });
@@ -301,15 +286,6 @@ if (searchInput && searchResults) {
   });
 }
 
-// =====================
-// Comparison init
-// =====================
-initComparisonHandler(map);
-initComparisonUI(map);
-
-window.startComparison = () => startComparison(map);
-window.stopComparison = stopComparison;
-window.isComparisonModeActive = isComparisonModeActive;
 
 // =====================
 // Chatbot init
